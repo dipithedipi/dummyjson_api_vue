@@ -1,6 +1,6 @@
 # starter
 
-https://fakestoreapi.com/docs
+https://dummyjson.com/
 
 ## Project setup
 ```
