@@ -10,16 +10,11 @@ export default {
   name: 'HomeView',
   data() {
     return {
-      prodotti: []
     }
   },
   methods: {
-    getProdotti() {
-      
-    }
   },
   mounted() {
-   
   }
 }
 </script>
