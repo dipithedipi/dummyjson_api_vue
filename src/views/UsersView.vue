@@ -21,7 +21,7 @@
         <v-icon
           size="small"
           class="me-2"
-          @click="console.log(item)"
+          @click="userInfoPage(item)"
         >
           mdi-account-arrow-right
         </v-icon>
@@ -99,6 +99,9 @@ export default {
         }
       }
       return matchingAttributes;
+    },
+    userInfoPage(item) {
+      this.$router.push({ name: 'userInfo', params: { id: item.id } });
     },
   },
 };
