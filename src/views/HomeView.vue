@@ -7,7 +7,7 @@
       <div class="text-subtitle-1 text-medium-emphasis">Account</div>
 
       <v-text-field density="compact" placeholder="Email address" prepend-inner-icon="mdi-email-outline"
-        variant="outlined"></v-text-field>
+        variant="outlined" v-model="userEmail"></v-text-field>
 
       <div class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between">
         Password
@@ -18,7 +18,7 @@
 
       <v-text-field :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'" :type="visible ? 'text' : 'password'"
         density="compact" placeholder="Enter your password" prepend-inner-icon="mdi-lock-outline" variant="outlined"
-        @click:append-inner="visible = !visible"></v-text-field>
+        @click:append-inner="visible = !visible" v-model="userPassword"></v-text-field>
 
       <v-card class="mb-12" color="surface-variant" variant="tonal">
         <v-card-text class="text-medium-emphasis text-caption">
@@ -27,14 +27,39 @@
         </v-card-text>
       </v-card>
 
-      <v-btn block class="mb-8" color="blue" size="large" variant="tonal" @click="() => { }">
+      <v-btn block class="mb-8" color="blue" size="large" variant="tonal" @click="login(userEmail, userPassword)">
         Log In
       </v-btn>
 
       <v-card-text class="text-center">
-        <a class="text-blue text-decoration-none" href="#" rel="noopener noreferrer" target="_blank">
-          Sign up now <v-icon icon="mdi-chevron-right"></v-icon>
-        </a>
+        <v-dialog width="500">
+          <template v-slot:activator="{ props }">
+            <v-btn v-bind="props">Sign up now<v-icon icon="mdi-chevron-right"></v-icon></v-btn>
+          </template>
+
+          <template v-slot:default="{ isActive }">
+            <v-card title="Register">
+                <v-card-text>
+                    Email:
+                    <v-text-field :rules="emailRules"></v-text-field>
+                </v-card-text>
+
+                <v-card-text>
+                    Password:
+                    <v-text-field :rules="passwordRules"></v-text-field>
+                </v-card-text>
+
+              <v-card-actions>
+                <v-spacer></v-spacer>
+
+                <v-btn
+                  text="Continue"
+                  @click="() => {isActive.value = false; register(userEmail, userPassword)}"
+                ></v-btn>
+              </v-card-actions>
+            </v-card>
+          </template>
+      </v-dialog>
       </v-card-text>
     </v-card>
   </div>
@@ -43,7 +68,7 @@
 
 <script>
 import users from "../../public/users.json";
-import { faker, tr } from '@faker-js/faker';
+import { faker } from '@faker-js/faker';
 
 export default {
   name: 'HomeView',
@@ -51,16 +76,36 @@ export default {
     return {
       visible: false,
       users: users,
+      userEmail: "",
+      userPassword: "",
+      emailRules: [
+        value => !!value || 'Required.',
+        value => (value || '').length <= 20 || 'Max 20 characters',
+        value => {
+          const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+          return pattern.test(value) || 'Invalid e-mail.'
+        },
+      ],
+      passwordRules: [
+        value => !!value || 'Required.',
+        value => (value || '').length <= 32 || 'Max 32 characters',
+        value => (value || '').length >= 8 || 'Min 0 characters',
+      ],
     }
   },
   methods: {
     login(email, password) {
+      if (email === "" || password === "") {
+        console.log("login: ", "Please enter email and password");
+        return false;
+      }
       for (let i = 0; i < this.users.length; i++) {
         if (this.users[i].email === email && this.users[i].password === password) {
           console.log("login: ", this.users[i]);
           return true;
         }
       }
+      console.log("login: ", "User not found");
       return false;
     },
     register(email, password) {
@@ -71,9 +116,9 @@ export default {
       this.users.push(
         new Object({
           id: this.users.length + 1,
-          firstName: faker.name.firstName(),
-          lastName: faker.name.lastName(),
-          maidenName: faker.person.fullname(),
+          firstName: faker.person.firstName(),
+          lastName: faker.person.lastName(),
+          maidenName: faker.person.middleName(),
           age: faker.number.int({ min: 16, max: 100 }),
           gender: faker.person.sexType(),
           email: email,
@@ -137,6 +182,7 @@ export default {
         }
         )
       );
+      console.log("register: ", this.users[this.users.length - 1]);
       return true;
     }
   },
