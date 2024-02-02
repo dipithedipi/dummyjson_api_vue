@@ -123,7 +123,7 @@
 -->
 
 <script>
-import MapWithMarker from "@/components/MapWithMarker.vue"; // Adjust the path accordingly
+import MapWithMarker from "@/components/MapWithMarker.vue";
 import users from "../../public/users.json";
 
 export default {

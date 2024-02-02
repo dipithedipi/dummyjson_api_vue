@@ -1,18 +1,144 @@
 <template>
-  <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
+  <div>
+    <v-img class="mx-auto my-6" max-width="228"
+      src="https://cdn.vuetifyjs.com/docs/images/logos/vuetify-logo-v3-slim-text-light.svg"></v-img>
+
+    <v-card class="mx-auto pa-12 pb-8" elevation="8" max-width="448" rounded="lg">
+      <div class="text-subtitle-1 text-medium-emphasis">Account</div>
+
+      <v-text-field density="compact" placeholder="Email address" prepend-inner-icon="mdi-email-outline"
+        variant="outlined"></v-text-field>
+
+      <div class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between">
+        Password
+
+        <a class="text-caption text-decoration-none text-blue" href="#" rel="noopener noreferrer" target="_blank">
+          Forgot login password?</a>
+      </div>
+
+      <v-text-field :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'" :type="visible ? 'text' : 'password'"
+        density="compact" placeholder="Enter your password" prepend-inner-icon="mdi-lock-outline" variant="outlined"
+        @click:append-inner="visible = !visible"></v-text-field>
+
+      <v-card class="mb-12" color="surface-variant" variant="tonal">
+        <v-card-text class="text-medium-emphasis text-caption">
+          Warning: After 3 consecutive failed login attempts, you account will be temporarily locked for three hours. If
+          you must login now, you can also click "Forgot login password?" below to reset the login password.
+        </v-card-text>
+      </v-card>
+
+      <v-btn block class="mb-8" color="blue" size="large" variant="tonal" @click="() => { }">
+        Log In
+      </v-btn>
+
+      <v-card-text class="text-center">
+        <a class="text-blue text-decoration-none" href="#" rel="noopener noreferrer" target="_blank">
+          Sign up now <v-icon icon="mdi-chevron-right"></v-icon>
+        </a>
+      </v-card-text>
+    </v-card>
   </div>
 </template>
 
+
 <script>
+import users from "../../public/users.json";
+import { faker, tr } from '@faker-js/faker';
 
 export default {
   name: 'HomeView',
   data() {
     return {
+      visible: false,
+      users: users,
     }
   },
   methods: {
+    login(email, password) {
+      for (let i = 0; i < this.users.length; i++) {
+        if (this.users[i].email === email && this.users[i].password === password) {
+          console.log("login: ", this.users[i]);
+          return true;
+        }
+      }
+      return false;
+    },
+    register(email, password) {
+      if (this.login(email, password)) {
+        console.log("register: ", "User already exists");
+        return false;
+      }
+      this.users.push(
+        new Object({
+          id: this.users.length + 1,
+          firstName: faker.name.firstName(),
+          lastName: faker.name.lastName(),
+          maidenName: faker.person.fullname(),
+          age: faker.number.int({ min: 16, max: 100 }),
+          gender: faker.person.sexType(),
+          email: email,
+          phone: faker.phone.number(),
+          username: faker.internet.userName(),
+          password: password,
+          birthDate: faker.date.birthdate(),
+          image: faker.image.avatar(),
+          bloodGroup: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"][Math.floor(Math.random() * 8)],
+          height: faker.number.int({ min: 150, max: 200 }),
+          weight: faker.number.float({ min: 30, max: 200 }),
+          eyeColor: ["Green", "Red", "Blue", "Yellow", "Orange", "Gray"][Math.floor(Math.random() * 6)],
+          hair: {
+            color: ["Green", "Red", "Blue", "Yellow", "Orange", "Gray"][Math.floor(Math.random() * 6)],
+            type: ["Straight", "Curly", "Wavy", "Coily", "Silky"][Math.floor(Math.random() * 5)],
+          },
+          domain: faker.internet.domainName(),
+          ip: faker.internet.ip(),
+          address: {
+            address: faker.location.streetAddress(),
+            city: faker.location.city(),
+            coordinates: {
+              lat: faker.location.latitude(),
+              lng: faker.location.longitude()
+            },
+            postalCode: faker.number.int({ min: 10000, max: 30000 }),
+            state: faker.location.countryCode('alpha-2')
+          },
+          macAddress: faker.internet.mac(),
+          university: String(faker.location.state() + " University"),
+          bank: {
+            cardExpire: faker.date.future(),
+            cardNumber: faker.finance.creditCardNumber(),
+            cardType: ["maestro", "visa"][Math.floor(Math.random() * 2)],
+            currency: faker.finance.currency(),
+            iban: faker.finance.iban()
+          },
+          company: {
+            address: {
+              address: faker.location.streetAddress(),
+              city: faker.location.city(),
+              coordinates: {
+                lat: faker.location.latitude(),
+                lng: faker.location.longitude()
+              },
+              postalCode: faker.number.int({ min: 10000, max: 30000 }),
+              state: faker.location.countryCode('alpha-2')
+            },
+            department: faker.commerce.department(),
+            name: faker.company.name(),
+            title: faker.person.jobTitle(),
+          },
+          ein: String(faker.number.int({ min: 10, max: 30 }) + "-" + faker.number.int({ min: 10000, max: 30000 })),
+          ssn: String(faker.number.int({ min: 100, max: 1000 }) + "-" + faker.number.int({ min: 10, max: 100 }) + "-" + faker.number.int({ min: 10000, max: 1000 })),
+          userAgent: faker.internet.userAgent(),
+          crypto: {
+            coin: ["Bitcoin", "Etherum", "Monero", "Coily", "Tether"][Math.floor(Math.random() * 4)],
+            wallet: faker.finance.bitcoinAddress(),
+            network: "Ethereum (ERC20)"
+          }
+        }
+        )
+      );
+      return true;
+    }
   },
   mounted() {
   }
