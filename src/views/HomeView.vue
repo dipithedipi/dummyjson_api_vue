@@ -39,14 +39,28 @@
 
           <template v-slot:default="{ isActive }">
             <v-card title="Register">
-                <v-card-text>
+              
+              <v-card-text>
                     Email:
-                    <v-text-field :rules="emailRules"></v-text-field>
+                    <v-text-field 
+                    :rules="emailRules" 
+                    v-model="userEmail">
+                    </v-text-field>
                 </v-card-text>
 
                 <v-card-text>
                     Password:
-                    <v-text-field :rules="passwordRules"></v-text-field>
+                    <v-text-field 
+                    :rules="passwordRules" 
+                    v-model="userPassword">
+                    </v-text-field>
+                </v-card-text>
+
+                <v-card-text>
+                    <v-checkbox 
+                    v-model="randomInfo"
+                    label="Random info"
+                    ></v-checkbox>
                 </v-card-text>
 
               <v-card-actions>
@@ -89,8 +103,9 @@ export default {
       passwordRules: [
         value => !!value || 'Required.',
         value => (value || '').length <= 32 || 'Max 32 characters',
-        value => (value || '').length >= 8 || 'Min 0 characters',
+        value => (value || '').length >= 8 || 'Min 8 characters',
       ],
+      randomInfo: true
     }
   },
   methods: {
@@ -113,50 +128,31 @@ export default {
         console.log("register: ", "User already exists");
         return false;
       }
-      this.users.push(
-        new Object({
-          id: this.users.length + 1,
-          firstName: faker.person.firstName(),
-          lastName: faker.person.lastName(),
-          maidenName: faker.person.middleName(),
-          age: faker.number.int({ min: 16, max: 100 }),
-          gender: faker.person.sexType(),
-          email: email,
-          phone: faker.phone.number(),
-          username: faker.internet.userName(),
-          password: password,
-          birthDate: faker.date.birthdate(),
-          image: faker.image.avatar(),
-          bloodGroup: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"][Math.floor(Math.random() * 8)],
-          height: faker.number.int({ min: 150, max: 200 }),
-          weight: faker.number.float({ min: 30, max: 200 }),
-          eyeColor: ["Green", "Red", "Blue", "Yellow", "Orange", "Gray"][Math.floor(Math.random() * 6)],
-          hair: {
-            color: ["Green", "Red", "Blue", "Yellow", "Orange", "Gray"][Math.floor(Math.random() * 6)],
-            type: ["Straight", "Curly", "Wavy", "Coily", "Silky"][Math.floor(Math.random() * 5)],
-          },
-          domain: faker.internet.domainName(),
-          ip: faker.internet.ip(),
-          address: {
-            address: faker.location.streetAddress(),
-            city: faker.location.city(),
-            coordinates: {
-              lat: faker.location.latitude(),
-              lng: faker.location.longitude()
+      if (this.randomInfo) {
+        this.users.push(
+          new Object({
+            id: this.users.length + 1,
+            firstName: faker.person.firstName(),
+            lastName: faker.person.lastName(),
+            maidenName: faker.person.middleName(),
+            age: faker.number.int({ min: 16, max: 100 }),
+            gender: faker.person.sexType(),
+            email: email,
+            phone: faker.phone.number(),
+            username: faker.internet.userName(),
+            password: password,
+            birthDate: faker.date.birthdate(),
+            image: faker.image.avatar(),
+            bloodGroup: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"][Math.floor(Math.random() * 8)],
+            height: faker.number.int({ min: 150, max: 200 }),
+            weight: Math.floor(faker.number.float({ min: 30, max: 200 })*100)/100,
+            eyeColor: ["Green", "Red", "Blue", "Yellow", "Orange", "Gray"][Math.floor(Math.random() * 6)],
+            hair: {
+              color: ["Green", "Red", "Blue", "Yellow", "Orange", "Gray"][Math.floor(Math.random() * 6)],
+              type: ["Straight", "Curly", "Wavy", "Coily", "Silky"][Math.floor(Math.random() * 5)],
             },
-            postalCode: faker.number.int({ min: 10000, max: 30000 }),
-            state: faker.location.countryCode('alpha-2')
-          },
-          macAddress: faker.internet.mac(),
-          university: String(faker.location.state() + " University"),
-          bank: {
-            cardExpire: faker.date.future(),
-            cardNumber: faker.finance.creditCardNumber(),
-            cardType: ["maestro", "visa"][Math.floor(Math.random() * 2)],
-            currency: faker.finance.currency(),
-            iban: faker.finance.iban()
-          },
-          company: {
+            domain: faker.internet.domainName(),
+            ip: faker.internet.ip(),
             address: {
               address: faker.location.streetAddress(),
               city: faker.location.city(),
@@ -167,21 +163,50 @@ export default {
               postalCode: faker.number.int({ min: 10000, max: 30000 }),
               state: faker.location.countryCode('alpha-2')
             },
-            department: faker.commerce.department(),
-            name: faker.company.name(),
-            title: faker.person.jobTitle(),
-          },
-          ein: String(faker.number.int({ min: 10, max: 30 }) + "-" + faker.number.int({ min: 10000, max: 30000 })),
-          ssn: String(faker.number.int({ min: 100, max: 1000 }) + "-" + faker.number.int({ min: 10, max: 100 }) + "-" + faker.number.int({ min: 10000, max: 1000 })),
-          userAgent: faker.internet.userAgent(),
-          crypto: {
-            coin: ["Bitcoin", "Etherum", "Monero", "Coily", "Tether"][Math.floor(Math.random() * 4)],
-            wallet: faker.finance.bitcoinAddress(),
-            network: "Ethereum (ERC20)"
+            macAddress: faker.internet.mac(),
+            university: String(faker.location.state() + " University"),
+            bank: {
+              cardExpire: faker.date.future(),
+              cardNumber: faker.finance.creditCardNumber(),
+              cardType: ["maestro", "visa"][Math.floor(Math.random() * 2)],
+              currency: faker.finance.currency(),
+              iban: faker.finance.iban()
+            },
+            company: {
+              address: {
+                address: faker.location.streetAddress(),
+                city: faker.location.city(),
+                coordinates: {
+                  lat: faker.location.latitude(),
+                  lng: faker.location.longitude()
+                },
+                postalCode: faker.number.int({ min: 10000, max: 30000 }),
+                state: faker.location.countryCode('alpha-2')
+              },
+              department: faker.commerce.department(),
+              name: faker.company.name(),
+              title: faker.person.jobTitle(),
+            },
+            ein: String(faker.number.int({ min: 10, max: 30 }) + "-" + faker.number.int({ min: 10000, max: 30000 })),
+            ssn: String(faker.number.int({ min: 100, max: 1000 }) + "-" + faker.number.int({ min: 10, max: 100 }) + "-" + faker.number.int({ min: 1000, max: 10000 })),
+            userAgent: faker.internet.userAgent(),
+            crypto: {
+              coin: ["Bitcoin", "Etherum", "Monero", "Coily", "Tether"][Math.floor(Math.random() * 4)],
+              wallet: faker.finance.bitcoinAddress(),
+              network: "Ethereum (ERC20)"
+            }
           }
-        }
-        )
-      );
+          )
+        );
+      } else {
+        this.users.push(
+          new Object({
+            id: this.users.length + 1,
+            email: email,
+            password: password
+          })
+        );
+      }
       console.log("register: ", this.users[this.users.length - 1]);
       return true;
     }
