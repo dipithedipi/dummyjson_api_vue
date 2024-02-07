@@ -1,10 +1,11 @@
 <template>
-  <div>
-    <v-img class="mx-auto my-6" max-width="228"
-      src="https://cdn.vuetifyjs.com/docs/images/logos/vuetify-logo-v3-slim-text-light.svg"></v-img>
-
+  <div v-if="!alreadyLogged()">
     <v-card class="mx-auto pa-12 pb-8" elevation="8" max-width="448" rounded="lg">
-      <div class="text-subtitle-1 text-medium-emphasis">Account</div>
+      <div class="text-medium-emphasis">
+        <strong>
+          Account
+        </strong>
+      </div>
 
       <v-text-field density="compact" placeholder="Email address" prepend-inner-icon="mdi-email-outline"
         variant="outlined" v-model="userEmail"></v-text-field>
@@ -27,7 +28,14 @@
         </v-card-text>
       </v-card>
 
-      <v-btn block class="mb-8" color="blue" size="large" variant="tonal" @click="login(userEmail, userPassword)">
+      <v-btn 
+        block 
+        class="mb-8" 
+        color="blue" 
+        size="large" 
+        variant="tonal" 
+        @click="() => {if(login(userEmail, userPassword)) {this.$router.push({ path: '/products' })}}"
+      >
         Log In
       </v-btn>
 
@@ -68,7 +76,7 @@
 
                 <v-btn
                   text="Continue"
-                  @click="() => {isActive.value = false; register(userEmail, userPassword)}"
+                  @click="() => {isActive.value = false; if(register(userEmail, userPassword)) {this.$router.push({ path: '/products' })}}"
                 ></v-btn>
               </v-card-actions>
             </v-card>
@@ -76,6 +84,9 @@
       </v-dialog>
       </v-card-text>
     </v-card>
+  </div>
+  <div v-else>
+    You are already logged in, if you want to log in with another account, please log out first.
   </div>
 </template>
 
@@ -89,7 +100,7 @@ export default {
   data() {
     return {
       visible: false,
-      users: users,
+      users: JSON.parse(localStorage.getItem("users")) || users,
       userEmail: "",
       userPassword: "",
       emailRules: [
@@ -105,7 +116,7 @@ export default {
         value => (value || '').length <= 32 || 'Max 32 characters',
         value => (value || '').length >= 8 || 'Min 8 characters',
       ],
-      randomInfo: true
+      randomInfo: true,
     }
   },
   methods: {
@@ -117,6 +128,7 @@ export default {
       for (let i = 0; i < this.users.length; i++) {
         if (this.users[i].email === email && this.users[i].password === password) {
           console.log("login: ", this.users[i]);
+          this.saveLocalLoggedUser(i);
           return true;
         }
       }
@@ -138,11 +150,11 @@ export default {
             age: faker.number.int({ min: 16, max: 100 }),
             gender: faker.person.sexType(),
             email: email,
+            image: faker.image.avatarLegacy(),
             phone: faker.phone.number(),
             username: faker.internet.userName(),
             password: password,
             birthDate: faker.date.birthdate(),
-            image: faker.image.avatar(),
             bloodGroup: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"][Math.floor(Math.random() * 8)],
             height: faker.number.int({ min: 150, max: 200 }),
             weight: Math.floor(faker.number.float({ min: 30, max: 200 })*100)/100,
@@ -208,8 +220,19 @@ export default {
         );
       }
       console.log("register: ", this.users[this.users.length - 1]);
+      this.saveLocalLoggedUser(this.users.length - 1);
       return true;
-    }
+    },
+    saveLocalLoggedUser(id) {
+      localStorage.setItem('loggedUser', JSON.stringify(this.users[id]));
+      localStorage.setItem('users', JSON.stringify(this.users));
+    },
+    alreadyLogged() {
+      if (JSON.parse(localStorage.getItem('loggedUser'))) {
+        return true;
+      }
+      return false;
+    },
   },
   mounted() {
   }
